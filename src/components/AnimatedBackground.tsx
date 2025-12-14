@@ -10,20 +10,9 @@ interface AnimatedBackgroundProps {
 export function AnimatedBackground({ mousePosition, scrollProgress, cubeExploded }: AnimatedBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isMouseIdle, setIsMouseIdle] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
   const lastMouseMoveTime = useRef(Date.now());
   const autoRotateAngle = useMotionValue(0);
   const mousePositionRef = useRef(mousePosition);
-
-  // Detect mobile devices
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   // Update ref without triggering re-renders
   useEffect(() => {
@@ -98,7 +87,7 @@ export function AnimatedBackground({ mousePosition, scrollProgress, cubeExploded
       active: boolean;
     }> = [];
     
-    const starCount = isMobile ? 800 : 3000; // Much less stars on mobile for performance
+    const starCount = 3000; // Reduced from 12000 for better performance
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
 
@@ -320,25 +309,30 @@ export function AnimatedBackground({ mousePosition, scrollProgress, cubeExploded
 
       {/* Glowing tesseract cube */}
       <motion.div
-        className={`fixed left-1/2 z-0 pointer-events-none ${isMobile ? 'scale-75' : ''}`}
+        className="fixed left-1/2 z-0 pointer-events-none"
         style={{
           top: cubeY,
           x: '-50%',
-          transform: 'translate3d(0,0,0)',
+          willChange: 'transform',
         }}
         animate={{
           x: cubeExploded 
-            ? 'calc(-50% + 1200px)' 
-            : '-50%',
+            ? 'calc(-50% + 800px)' 
+            : isMouseIdle ? '-50%' : `calc(-50% + ${mousePosition.x * 30}px)`,
           y: cubeExploded 
-            ? -900 
-            : 0,
-          scale: cubeExploded ? 0 : (isMobile ? 0.6 : 1),
+            ? -600 
+            : isMouseIdle ? 0 : mousePosition.y * 30,
+          scale: cubeExploded ? 0.1 : 1,
           opacity: cubeExploded ? 0 : 1,
         }}
         transition={{ 
-          duration: 1.5,
-          ease: [0.33, 1, 0.68, 1],
+          type: 'spring', 
+          stiffness: 50, 
+          damping: 20,
+          scale: { duration: 1.2, ease: [0.16, 1, 0.3, 1] },
+          opacity: { duration: 1.2, ease: [0.16, 1, 0.3, 1] },
+          x: { duration: 1.2, ease: [0.16, 1, 0.3, 1] },
+          y: { duration: 1.2, ease: [0.16, 1, 0.3, 1] },
         }}
       >
         <motion.div
@@ -347,7 +341,13 @@ export function AnimatedBackground({ mousePosition, scrollProgress, cubeExploded
             rotateX: cubeRotateX,
             rotateY: isMouseIdle ? autoRotateAngle : cubeRotateY,
             transformStyle: 'preserve-3d',
-            transform: 'translate3d(0,0,0)',
+            willChange: 'transform',
+          }}
+          animate={{
+            rotateZ: cubeExploded ? 720 : 0,
+          }}
+          transition={{
+            rotateZ: { duration: 1.2, ease: [0.16, 1, 0.3, 1] }
           }}
         >
           {/* Single cube with crystal-like appearance */}
@@ -426,49 +426,72 @@ export function AnimatedBackground({ mousePosition, scrollProgress, cubeExploded
           <motion.div
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
             initial={{ opacity: 0 }}
-            animate={{ opacity: [0, 0.6, 0] }}
-            transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+            animate={{ opacity: [0, 0.8, 0.6, 0] }}
+            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
           >
-            {/* Simplified trail - single gradient path */}
-            <div 
-              className="absolute"
-              style={{
-                width: '1200px',
-                height: '900px',
+            {/* Trail gradient */}
+            <svg 
+              width="1000" 
+              height="800" 
+              style={{ 
+                position: 'absolute',
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
-                background: 'linear-gradient(135deg, transparent 0%, transparent 40%, rgba(100, 230, 255, 0.2) 50%, rgba(150, 240, 255, 0.4) 70%, rgba(200, 250, 255, 0.6) 100%)',
-                filter: 'blur(40px)',
               }}
-            />
+            >
+              <defs>
+                <linearGradient id="trail-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
+                  <stop offset="0%" style={{ stopColor: 'rgba(0, 212, 255, 0)', stopOpacity: 0 }} />
+                  <stop offset="20%" style={{ stopColor: 'rgba(100, 230, 255, 0.15)', stopOpacity: 1 }} />
+                  <stop offset="50%" style={{ stopColor: 'rgba(150, 240, 255, 0.4)', stopOpacity: 1 }} />
+                  <stop offset="100%" style={{ stopColor: 'rgba(200, 250, 255, 0.7)', stopOpacity: 1 }} />
+                </linearGradient>
+              </defs>
+              <path
+                d="M 100 700 Q 300 400 900 100"
+                fill="none"
+                stroke="url(#trail-gradient)"
+                strokeWidth="80"
+                strokeLinecap="round"
+                style={{ filter: 'blur(20px)' }}
+              />
+              <path
+                d="M 100 700 Q 300 400 900 100"
+                fill="none"
+                stroke="url(#trail-gradient)"
+                strokeWidth="40"
+                strokeLinecap="round"
+                style={{ filter: 'blur(10px)' }}
+              />
+            </svg>
             
-            {/* Reduced sparkle particles */}
-            {Array.from({ length: 12 }).map((_, i) => {
-              const progress = i / 12;
-              const x = -200 + progress * 1000;
-              const y = 200 - progress * 800;
+            {/* Sparkle particles along the trail */}
+            {Array.from({ length: 30 }).map((_, i) => {
+              const progress = i / 30;
+              const x = 100 + progress * 800 - 500;
+              const y = 300 - progress * 600;
               
               return (
                 <motion.div
                   key={`trail-particle-${i}`}
-                  className="absolute rounded-full bg-cyan-200"
+                  className="absolute rounded-full bg-cyan-300"
                   style={{
-                    width: 3,
-                    height: 3,
+                    width: 2 + Math.random() * 4,
+                    height: 2 + Math.random() * 4,
                     left: x,
                     top: y,
-                    boxShadow: '0 0 8px rgba(0, 212, 255, 0.6)',
+                    boxShadow: '0 0 10px rgba(0, 212, 255, 0.8)',
                   }}
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{
-                    opacity: [0, 1, 0],
-                    scale: [0, 1.2, 0],
+                    opacity: [0, 0.8, 0],
+                    scale: [0, 1.5, 0],
                   }}
                   transition={{
-                    duration: 0.8,
-                    delay: i * 0.05,
-                    ease: [0.22, 1, 0.36, 1],
+                    duration: 1,
+                    delay: i * 0.02,
+                    ease: [0.16, 1, 0.3, 1],
                   }}
                 />
               );
