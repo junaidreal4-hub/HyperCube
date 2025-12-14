@@ -71,7 +71,7 @@ const tools = [
 
 export function TechStack() {
   return (
-    <section id="tools" className="min-h-screen flex items-center justify-center px-8 py-32 relative">
+    <section id="tools" className="min-h-screen flex items-center justify-center px-4 md:px-8 py-16 md:py-32 relative">
       {/* Background gradient orbs */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl" />
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />

@@ -32,22 +32,24 @@ export function Navbar({ scrollDirection }: NavbarProps) {
   return (
     <>
       <motion.nav
-        className="fixed top-0 left-0 right-0 z-50 px-8 py-4"
+        className="fixed top-0 left-0 right-0 z-50 px-4 md:px-8 py-4"
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: 'easeOut' }}
+        transition={{ duration: 0.6, delay: 0.2 }}
       >
-        <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-4">
-          {/* Left section: Logo and Company Name */}
-          <motion.div 
-            className="flex items-center gap-4"
-            animate={{
-              opacity: scrollDirection === 'down' ? 0 : 1,
-              scale: scrollDirection === 'down' ? 0.3 : 1,
-              x: scrollDirection === 'down' ? 600 : 0,
-              y: scrollDirection === 'down' ? -10 : 0,
+        <div className="max-w-[1440px] w-full mx-auto flex items-center justify-between">
+          {/* Logo */}
+          <motion.a
+            href="#"
+            className="text-white tracking-tight relative group"
+            style={{
+              fontSize: 'clamp(1.25rem, 3vw, 1.75rem)',
+              fontWeight: '900',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em'
             }}
-            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: 'spring', stiffness: 300 }}
           >
             <img 
               src={logo} 
@@ -55,7 +57,7 @@ export function Navbar({ scrollDirection }: NavbarProps) {
               className="w-16 h-16 object-contain hover:scale-110 transition-transform"
             />
             <span className="text-white tracking-wider font-bold">HYPERCUBE</span>
-          </motion.div>
+          </motion.a>
 
           {/* Right section: Social + CTA + Menu */}
           <motion.div 

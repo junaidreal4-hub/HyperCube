@@ -4,8 +4,8 @@ import { ArrowRight } from 'lucide-react';
 
 export function Hero() {
   return (
-    <section className="min-h-screen flex items-center justify-center px-8 pt-32 md:pt-40">
-      <div className="max-w-[1440px] w-full mx-auto grid md:grid-cols-2 gap-12 items-center">
+    <section className="min-h-screen flex items-center justify-center px-4 md:px-8 pt-24 md:pt-32 lg:pt-40">
+      <div className="max-w-[1440px] w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
         {/* Left: Content */}
         <motion.div
           initial={{ opacity: 0, x: -50 }}

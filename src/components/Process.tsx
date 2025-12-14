@@ -31,7 +31,7 @@ const steps = [
 
 export function Process() {
   return (
-    <section className="min-h-screen flex items-center justify-center px-8 py-24">
+    <section className="min-h-screen flex items-center justify-center px-4 md:px-8 py-16 md:py-24">
       <div className="max-w-[1440px] w-full mx-auto">
         <SectionHeader
           title="How It Works"

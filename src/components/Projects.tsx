@@ -25,9 +25,9 @@ const projects = [
 
 export function Projects() {
   return (
-    <section id="projects" className="min-h-screen flex items-center justify-center px-8 py-24">
+    <section id="projects" className="min-h-screen flex items-center justify-center px-4 md:px-8 py-16 md:py-24">
       <div className="max-w-[1440px] w-full mx-auto">
-        <div className="grid md:grid-cols-2 gap-12 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
           {/* Left: Header */}
           <SectionHeader
             title="Featured Work"
